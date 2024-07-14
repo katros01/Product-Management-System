@@ -3,6 +3,7 @@ package Product.Management.System.Product.Management.System.models;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -20,14 +21,17 @@ public class Product {
     private Double price;
     private int quantity;
 
+    @OneToMany(mappedBy = "product")
+    private List<Orders> orders;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
 
-    public Product(String id, String name, String categoryId, Double price, int quantity) {
+    public Product(String id, String name, String categoryId, Category category, Double price, int quantity) {
         this.id = id;
         this.name = name;
-//        this.categoryId = categoryId;
+        this.category = category;
         this.price = price;
         this.quantity = quantity;
 
@@ -84,5 +88,13 @@ public class Product {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

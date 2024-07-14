@@ -2,6 +2,7 @@ package Product.Management.System.Product.Management.System.controllers;
 
 import Product.Management.System.Product.Management.System.models.UserAccount;
 import Product.Management.System.Product.Management.System.services.UserService;
+import Product.Management.System.Product.Management.System.utils.CustomResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -24,29 +25,23 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserAccount> getUserById(@PathVariable String id) {
+    public ResponseEntity<CustomResponse<UserAccount>> getUserById(@PathVariable String id) {
         Optional<UserAccount> user = userService.getUserById(id);
-        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return user.map(value -> new ResponseEntity<>(new CustomResponse<>("User found", HttpStatus.OK.value(), value), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(new CustomResponse<>("User Not found", HttpStatus.NOT_FOUND.value()),HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public ResponseEntity<UserAccount> createUser(@RequestBody UserAccount user) {
+    public ResponseEntity<CustomResponse<UserAccount>> createUser(@RequestBody UserAccount user) {
         UserAccount createdUser = userService.saveUser(user);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        return new ResponseEntity<>(new CustomResponse<>("User created successfully", HttpStatus.CREATED.value(), createdUser), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserAccount> updateUser(@PathVariable String id, @RequestBody UserAccount user) {
+    public ResponseEntity<CustomResponse<UserAccount>> updateUser(@PathVariable String id, @RequestBody UserAccount user) {
         user.setId(id);
         UserAccount updatedUser = userService.saveUser(user);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new CustomResponse<>("User Updated successfully", HttpStatus.OK.value(),updatedUser), HttpStatus.OK);
     }
 }
 

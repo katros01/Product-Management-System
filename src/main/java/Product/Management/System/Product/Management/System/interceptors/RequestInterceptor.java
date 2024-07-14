@@ -13,9 +13,9 @@ public class RequestInterceptor implements HandlerInterceptor {
         System.out.println("METHOD type:" + request.getMethod());
         System.out.println("Request URI: " + request.getRequestURI());
         System.out.println("Servlet PATH: " + request.getServletPath());
-        //check which controller method is requested
+
         if(handler instanceof HandlerMethod){
-            //can be added different logics
+
             Class<?> controllerClass = ((HandlerMethod) handler).getBeanType();
             String methodName = ((HandlerMethod) handler).getMethod().getName();
             System.out.println("Controller name: " + controllerClass.getName());
@@ -32,9 +32,8 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         if(ex != null){
-            //exception handle part
             System.out.println("An error occured.");
         }
-        System.out.println("3 - after completion.");
+        System.out.println("completion");
     }
 }

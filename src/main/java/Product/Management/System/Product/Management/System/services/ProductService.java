@@ -3,6 +3,8 @@ package Product.Management.System.Product.Management.System.services;
 import Product.Management.System.Product.Management.System.models.Product;
 import Product.Management.System.Product.Management.System.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,12 +26,16 @@ public class ProductService {
         return productRepository.findAllProducts();
     }
 
-    public Optional<Product> getProductById(Long id) {
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findAllProducts(pageable);
+    }
+
+    public Optional<Product> getProductById(String id) {
         return productRepository.findProductById(id);
     }
 
-    public List<Product> getProductsByCategoryId(String categoryId) {
-        return productRepository.findProductsByCategoryId(categoryId);
+    public Page<Product> getProductsByCategoryId(String categoryId, Pageable pageable) {
+        return productRepository.findProductsByCategoryId(categoryId, pageable);
     }
 
     public Product addProduct(Product product) {
@@ -39,7 +45,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public void deleteProduct(Long id) {
+    public void deleteProduct(String id) {
         productRepository.deleteById(id);
     }
 }

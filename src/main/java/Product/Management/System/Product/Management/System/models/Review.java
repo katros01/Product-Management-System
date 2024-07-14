@@ -20,6 +20,7 @@ public class Review {
     private LocalDateTime reviewDate;
 
     public Review() {
+        this.reviewDate = LocalDateTime.now();
     }
     public String getId() {
         return id;

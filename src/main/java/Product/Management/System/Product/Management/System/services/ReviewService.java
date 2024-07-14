@@ -34,8 +34,5 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public void deleteReview(String id) {
-        reviewRepository.deleteById(id);
-    }
 }
 

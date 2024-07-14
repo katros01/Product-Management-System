@@ -32,5 +32,9 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+    public Optional<UserAccount> authenticate(String username, String password) {
+        return userRepository.findByUsernameAndPassword(username, password);
+    }
 }
 

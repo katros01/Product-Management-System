@@ -3,6 +3,7 @@ package Product.Management.System.Product.Management.System.models;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class UserAccount {
@@ -14,6 +15,9 @@ public class UserAccount {
     private String username;
     private String password;
     private String role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Orders> orders;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

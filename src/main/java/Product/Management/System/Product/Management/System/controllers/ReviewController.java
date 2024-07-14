@@ -2,6 +2,8 @@ package Product.Management.System.Product.Management.System.controllers;
 
 import Product.Management.System.Product.Management.System.models.Review;
 import Product.Management.System.Product.Management.System.services.ReviewService;
+import Product.Management.System.Product.Management.System.utils.CustomResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,54 +13,47 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/reviews")
+@RequestMapping("/reviews")
 public class ReviewController {
 
     @Autowired
     private ReviewService reviewService;
 
     @GetMapping
-    public ResponseEntity<List<Review>> getAllReviews() {
+    public ResponseEntity<CustomResponse<List<Review>>> getAllReviews() {
         List<Review> reviews = reviewService.getAllReviews();
-        return new ResponseEntity<>(reviews, HttpStatus.OK);
+        return new ResponseEntity<>(new CustomResponse<>("Reviews retrieved successfully", HttpStatus.OK.value(), reviews), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReviewById(@PathVariable String id) {
+    public ResponseEntity<CustomResponse<Review>> getReviewById(@PathVariable String id) {
         Optional<Review> review = reviewService.getReviewById(id);
-        return review.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return review.map(value -> new ResponseEntity<>(new CustomResponse<>("Review found", HttpStatus.OK.value(), value), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(new CustomResponse<>("Review not found", HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<Review>> getReviewsByProductId(@PathVariable String productId) {
+    public ResponseEntity<CustomResponse<List<Review>>> getReviewsByProductId(@PathVariable String productId) {
         List<Review> reviews = reviewService.getReviewsByProductId(productId);
-        return new ResponseEntity<>(reviews, HttpStatus.OK);
+        return new ResponseEntity<>(new CustomResponse<>("Reviews retrieved successfully", HttpStatus.OK.value(), reviews), HttpStatus.OK);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Review>> getReviewsByUserId(@PathVariable String userId) {
+    public ResponseEntity<CustomResponse<List<Review>>> getReviewsByUserId(@PathVariable String userId) {
         List<Review> reviews = reviewService.getReviewsByUserId(userId);
-        return new ResponseEntity<>(reviews, HttpStatus.OK);
+        return new ResponseEntity<>(new CustomResponse<>("Reviews retrieved successfully", HttpStatus.OK.value(), reviews), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody Review review) {
+    public ResponseEntity<CustomResponse<Review>> createReview(@RequestBody Review review, HttpSession session) {
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return new ResponseEntity<>(new CustomResponse<>("Unauthorized", HttpStatus.UNAUTHORIZED.value()), HttpStatus.UNAUTHORIZED);
+        }
+
+        review.setUserId(userId);
         Review createdReview = reviewService.saveReview(review);
-        return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Review> updateReview(@PathVariable String id, @RequestBody Review review) {
-        review.setId(id);
-        Review updatedReview = reviewService.saveReview(review);
-        return new ResponseEntity<>(updatedReview, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable String id) {
-        reviewService.deleteReview(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new CustomResponse<>("Review was added successfully", HttpStatus.CREATED.value(), createdReview), HttpStatus.CREATED);
     }
 }
 
